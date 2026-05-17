@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Tizimi</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1a73e8;
+    --primary-dark: #1557b0;
+    --success: #0f9d58;
+    --danger: #d93025;
+    --warn: #f29900;
+    --bg: #f0f4ff;
+    --card: #ffffff;
+    --text: #1e2a4a;
+    --muted: #6b7a9a;
+    --border: #dde3f0;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(26,115,232,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: block; }
+
+  /* ===== HOME ===== */
+  #home {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    background: linear-gradient(135deg, #1a73e8 0%, #0f4fb5 100%);
+  }
+  #home.active { display: flex; }
+  .home-logo {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: bounce 1.5s infinite alternate;
+  }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+  .home-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: white;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .home-sub {
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 15px;
+  }
+  .home-btns { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px; }
+  .btn-home {
+    padding: 18px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .btn-home:active { transform: scale(0.97); }
+  .btn-student { background: white; color: var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .btn-admin { background: rgba(255,255,255,0.15); color: white; border: 2px solid rgba(255,255,255,0.4); }
+
+  /* ===== ADMIN PANEL ===== */
+  #admin {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  #admin.active { display: flex; }
+  .admin-header {
+    background: var(--primary);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 12px rgba(26,115,232,0.3);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .admin-header h1 { font-size: 18px; font-weight: 800; flex: 1; }
+  .back-btn {
+    background: rgba(255,255,255,0.2);
+    border: none; color: white;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .admin-body { padding: 20px; flex: 1; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .stat-num { font-size: 32px; font-weight: 900; color: var(--primary); }
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 4px; }
+
+  /* Add question form */
+  .form-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+  }
+  .form-card h2 { font-size: 16px; font-weight: 800; margin-bottom: 16px; color: var(--text); }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { font-size: 13px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: #f8faff;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group textarea:focus {
+    border-color: var(--primary);
+    background: white;
+  }
+  .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .answer-item { position: relative; }
+  .answer-label {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    font-weight: 800; color: var(--primary); font-size: 14px;
+  }
+  .answer-item input { padding-left: 30px; }
+
+  .correct-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .correct-btn {
+    padding: 10px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: #f8faff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+  }
+  .correct-btn.selected { border-color: var(--success); background: #e6f4ea; color: var(--success); }
+
+  .btn-add {
+    width: 100%;
+    padding: 15px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-add:active { transform: scale(0.98); background: var(--primary-dark); }
+
+  /* Questions list */
+  .questions-list h2 { font-size: 16px; font-weight: 800; margin-bottom: 14px; }
+  .q-item {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .q-num {
+    background: var(--primary);
+    color: white;
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .q-content { flex: 1; min-width: 0; }
+  .q-text { font-weight: 700; font-size: 14px; margin-bottom: 8px; word-break: break-word; }
+  .q-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .q-ans {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #f0f4ff;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .q-ans.correct { background: #e6f4ea; color: var(--success); }
+  .q-delete {
+    background: #fce8e6;
+    color: var(--danger);
+    border: none;
+    border-radius: 8px;
+    width: 32px; height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+  }
+  .empty-state .emoji { font-size: 48px; margin-bottom: 12px; }
+
+  /* ===== STUDENT SCREEN ===== */
+  #student { display: none; flex-direction: column; min-height: 100vh; }
+  #student.active { display: flex; }
+
+  #student-start {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    background: linear-gradient(135deg, #0f9d58 0%, #0b7a42 100%);
+  }
+  .start-icon { font-size: 72px; margin-bottom: 20px; }
+  .start-title { font-size: 28px; font-weight: 900; color: white; text-align: center; margin-bottom: 8px; }
+  .start-sub { color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 12px; }
+  .start-count {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 800;
+    font-size: 16px;
+    margin-bottom: 32px;
+  }
+
+  .name-input-wrap { width: 100%; max-width: 340px; margin-bottom: 16px; }
+  .name-input-wrap input {
+    width: 100%;
+    padding: 16px;
+    border-radius: var(--radius);
+    border: 2px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    outline: none;
+    text-align: center;
+  }
+  .name-input-wrap input::placeholder { color: rgba(255,255,255,0.65); }
+
+  .btn-start {
+    width: 100%; max-width: 340px;
+    padding: 18px;
+    background: white;
+    color: var(--success);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .no-questions-msg {
+    background: rgba(255,255,255,0.2);
+    border-radius: var(--radius);
+    padding: 20px;
+    color: white;
+    text-align: center;
+    font-weight: 700;
+    max-width: 340px;
+  }
+
+  /* Test taking */
+  #test-taking { display: none; flex-direction: column; min-height: 100vh; }
+  #test-taking.active-flex { display: flex; }
+
+  .test-header {
+    background: var(--success);
+    color: white;
+    padding: 16px 20px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .test-header-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .test-header-top h2 { font-size: 16px; font-weight: 800; }
+  .q-counter { font-size: 14px; font-weight: 700; opacity: 0.9; }
+  .progress-bar {
+    height: 6px; background: rgba(255,255,255,0.3);
+    border-radius: 10px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: white;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+  }
+
+  .test-body { flex: 1; padding: 20px; }
+  .question-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .question-num {
+    font-size: 12px; font-weight: 800;
+    color: var(--success);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .question-text {
+    font-size: 17px; font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .options-list { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    background: #f8faff;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    font-family: 'Nunito', sans-serif;
+    width: 100%;
+  }
+  .option-btn:active { transform: scale(0.98); }
+  .option-btn.selected { border-color: var(--success); background: #e6f4ea; }
+  .option-letter {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--border);
+    color: var(--muted);
+    font-weight: 800; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .option-btn.selected .option-letter { background: var(--success); color: white; }
+  .option-text { font-size: 15px; font-weight: 600; color: var(--text); }
+
+  .nav-btns { display: flex; gap: 12px; padding: 0 20px 24px; }
+  .btn-nav {
+    flex: 1; padding: 15px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-prev { background: var(--border); color: var(--muted); }
+  .btn-next { background: var(--success); color: white; }
+  .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-finish { background: var(--primary); color: white; flex: 2; }
+
+  /* Results */
+  #results { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: var(--bg); }
+  #results.active-flex { display: flex; }
+
+  .result-card {
+    background: white;
+    border-radius: 24px;
+    padding: 32px 24px;
+    box-shadow: 0 8px 40px rgba(26,115,232,0.12);
+    text-align: center;
+    width: 100%; max-width: 380px;
+    margin-bottom: 20px;
+  }
+  .result-emoji { font-size: 64px; margin-bottom: 16px; }
+  .result-name { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+  .result-score {
+    font-size: 56px; font-weight: 900;
+    background: linear-gradient(135deg, var(--primary), var(--success));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 16px 0 8px;
+  }
+  .result-detail { color: var(--muted); font-weight: 600; font-size: 15px; margin-bottom: 24px; }
+
+  .result-breakdown {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-bottom: 24px;
+  }
+  .breakdown-item {
+    border-radius: 12px; padding: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .breakdown-item.correct { background: #e6f4ea; }
+  .breakdown-item.wrong { background: #fce8e6; }
+  .breakdown-icon { font-size: 24px; }
+  .breakdown-num { font-size: 22px; font-weight: 900; }
+  .breakdown-lbl { font-size: 12px; font-weight: 700; }
+  .breakdown-item.correct .breakdown-num { color: var(--success); }
+  .breakdown-item.wrong .breakdown-num { color: var(--danger); }
+
+  .review-list { width: 100%; max-width: 380px; }
+  .review-list h3 { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .review-item {
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--border);
+  }
+  .review-item.correct { border-left-color: var(--success); }
+  .review-item.wrong { border-left-color: var(--danger); }
+  .review-q { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .review-ans { font-size: 12px; color: var(--muted); }
+  .review-ans span { font-weight: 700; }
+  .review-ans .your-ans { color: var(--danger); }
+  .review-ans .correct-ans { color: var(--success); }
+
+  .btn-retry {
+    width: 100%; max-width: 380px;
+    padding: 16px;
+    background: var(--primary);
+    color: white; border: none;
+    border-radius: var(--radius);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer; margin-top: 4px;
+  }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: white;
+    padding: 12px 24px; border-radius: 12px;
+    font-weight: 700; font-size: 14px;
+    z-index: 9999; opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  .settings-row {
+    display: flex; gap: 10px; margin-bottom: 16px;
+  }
+  .setting-chip {
+    flex: 1; padding: 10px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: #f8faff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 700;
+    color: var(--muted); cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .setting-chip.on { border-color: var(--primary); background: #e8f0fe; color: var(--primary); }
+
+  .share-section {
+    background: #e8f0fe;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--primary);
+    font-weight: 700;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-logo">📚</div>
+  <div class="home-title">Test Tizimi</div>
+  <div class="home-sub">O'qituvchi va o'quvchilar uchun</div>
+  <div class="home-btns">
+    <button class="btn-home btn-student" onclick="showScreen('student')">🎓 Test topshirish</button>
+    <button class="btn-home btn-admin" onclick="showScreen('admin')">⚙️ Admin panel</button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin" class="screen">
+  <div class="admin-header">
+    <button class="back-btn" onclick="showScreen('home')">←</button>
+    <h1>⚙️ Admin Panel</h1>
+  </div>
+  <div class="admin-body">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="totalQ">0</div>
+        <div class="stat-label">📝 Savollar</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="totalAttempts">0</div>
+        <div class="stat-label">👥 Urinishlar</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h2>➕ Yangi savol qo'shish</h2>
+
+      <div class="form-group">
+        <label>SAVOL MATNI</label>
+        <textarea id="qText" rows="3" placeholder="Savolingizni yozing..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>JAVOBLAR (A, B, C, D)</label>
+        <div class="answers-grid">
+          <div class="answer-item">
+            <span class="answer-label">A</span>
+            <input id="ans0" type="text" placeholder="1-javob">
+          </div>
+          <div class="answer-item">
+            <span class="answer-label">B</span>
+            <input id="ans1" type="text" placeholder="2-javob">
+          </div>
+          <div class="answer-item">
+            <span class="answer-label">C</span>
+            <input id="ans2" type="text" placeholder="3-javob">
+          </div>
+          <div class="answer-item">
+            <span class="answer-label">D</span>
+            <input id="ans3" type="text" placeholder="4-javob">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>TO'G'RI JAVOB</label>
+        <div class="correct-select">
+          <button class="correct-btn" onclick="selectCorrect(0)">A — 1-javob</button>
+          <button class="correct-btn" onclick="selectCorrect(1)">B — 2-javob</button>
+          <button class="correct-btn" onclick="selectCorrect(2)">C — 3-javob</button>
+          <button class="correct-btn" onclick="selectCorrect(3)">D — 4-javob</button>
+        </div>
+      </div>
+
+      <button class="btn-add" onclick="addQuestion()">✅ Savolni saqlash</button>
+    </div>
+
+    <div class="settings-row">
+      <button class="setting-chip" id="shuffleBtn" onclick="toggleSetting('shuffle')">🔀 Aralashtirish: O'CH</button>
+      <button class="setting-chip" id="limitBtn" onclick="toggleLimit()">🔢 Limit: Hammasi</button>
+    </div>
+
+    <div class="share-section" id="shareSection">
+      📱 O'quvchilar shu faylni ochib <b>"Test topshirish"</b> tugmasini bosadi
+    </div>
+
+    <div class="questions-list">
+      <h2>📋 Savollar ro'yxati</h2>
+      <div id="qList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT -->
+<div id="student" class="screen">
+  <div id="student-start">
+    <div class="start-icon">🎓</div>
+    <div class="start-title">Test Topshirish</div>
+    <div class="start-sub">Ismingizni kiriting va boshlang</div>
+    <div id="start-count" class="start-count">⏳ Yuklanmoqda...</div>
+    <div class="name-input-wrap">
+      <input type="text" id="studentName" placeholder="Ismingiz va familiyangiz" maxlength="50">
+    </div>
+    <div id="startBtnWrap">
+      <button class="btn-start" onclick="startTest()">▶️ Testni boshlash</button>
+    </div>
+    <button style="margin-top:16px;background:rgba(255,255,255,0.15);color:white;border:none;padding:10px 20px;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;" onclick="showScreen('home')">← Orqaga</button>
+  </div>
+
+  <div id="test-taking">
+    <div class="test-header">
+      <div class="test-header-top">
+        <h2 id="testTitle">Test</h2>
+        <span class="q-counter" id="qCounter">1 / 10</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:10%"></div>
+      </div>
+    </div>
+    <div class="test-body">
+      <div class="question-card">
+        <div class="question-num" id="qNum">SAVOL 1</div>
+        <div class="question-text" id="qTextDisplay"></div>
+      </div>
+      <div class="options-list" id="optionsList"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-nav btn-prev" id="prevBtn" onclick="navigate(-1)">← Oldingi</button>
+      <button class="btn-nav btn-next" id="nextBtn" onclick="navigate(1)">Keyingi →</button>
+      <button class="btn-nav btn-finish" id="finishBtn" onclick="finishTest()" style="display:none;">✅ Tugatish</button>
+    </div>
+  </div>
+
+  <div id="results">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-name" id="resultName"></div>
+      <div class="result-score" id="resultScore">0%</div>
+      <div class="result-detail" id="resultDetail"></div>
+      <div class="result-breakdown">
+        <div class="breakdown-item correct">
+          <div class="breakdown-icon">✅</div>
+          <div>
+            <div class="breakdown-num" id="correctCount">0</div>
+            <div class="breakdown-lbl">To'g'ri</div>
+          </div>
+        </div>
+        <div class="breakdown-item wrong">
+          <div class="breakdown-icon">❌</div>
+          <div>
+            <div class="breakdown-num" id="wrongCount">0</div>
+            <div class="breakdown-lbl">Noto'g'ri</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="review-list">
+      <h3>Javoblar tahlili</h3>
+      <div id="reviewList"></div>
+    </div>
+    <button class="btn-retry" onclick="retryTest()">🔄 Qayta urinish</button>
+    <button style="margin-top:10px;width:100%;max-width:380px;padding:14px;background:white;color:var(--muted);border:2px solid var(--border);border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;" onclick="showScreen('home')">🏠 Bosh sahifa</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+let questions = [];
+let settings = { shuffle: false, limit: 0 };
+let testQuestions = [];
+let currentQ = 0;
+let answers = {};
+let studentName = '';
+let attempts = 0;
+let correctSelected = -1;
+
+// ===== STORAGE =====
+function save() {
+  try {
+    localStorage.setItem('quiz_questions', JSON.stringify(questions));
+    localStorage.setItem('quiz_settings', JSON.stringify(settings));
+    localStorage.setItem('quiz_attempts', attempts.toString());
+  } catch(e) {}
+}
+
+function load() {
+  try {
+    const q = localStorage.getItem('quiz_questions');
+    if (q) questions = JSON.parse(q);
+    const s = localStorage.getItem('quiz_settings');
+    if (s) settings = JSON.parse(s);
+    const a = localStorage.getItem('quiz_attempts');
+    if (a) attempts = parseInt(a) || 0;
+  } catch(e) {}
+}
+
+// ===== SCREENS =====
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if (name === 'admin') renderAdmin();
+  if (name === 'student') showStudentStart();
+  if (name === 'home') {
+    document.getElementById('home').classList.add('active');
+  }
+}
+
+// ===== ADMIN =====
+let selectedCorrect = -1;
+
+function selectCorrect(idx) {
+  selectedCorrect = idx;
+  document.querySelectorAll('.correct-btn').forEach((b,i) => {
+    b.classList.toggle('selected', i === idx);
+  });
+}
+
+function addQuestion() {
+  const text = document.getElementById('qText').value.trim();
+  const ans = [0,1,2,3].map(i => document.getElementById('ans'+i).value.trim());
+
+  if (!text) { showToast('⚠️ Savol matnini kiriting!'); return; }
+  if (ans.some(a => !a)) { showToast('⚠️ Barcha 4 ta javobni kiriting!'); return; }
+  if (selectedCorrect === -1) { showToast('⚠️ To\'g\'ri javobni tanlang!'); return; }
+
+  questions.push({ id: Date.now(), text, answers: ans, correct: selectedCorrect });
+  save();
+  renderAdmin();
+
+  // Reset form
+  document.getElementById('qText').value = '';
+  [0,1,2,3].forEach(i => document.getElementById('ans'+i).value = '');
+  selectedCorrect = -1;
+  document.querySelectorAll('.correct-btn').forEach(b => b.classList.remove('selected'));
+
+  showToast('✅ Savol saqlandi!');
+  document.getElementById('qText').focus();
+}
+
+function deleteQuestion(id) {
+  if (!confirm('Bu savolni o\'chirasizmi?')) return;
+  questions = questions.filter(q => q.id !== id);
+  save();
+  renderAdmin();
+  showToast('🗑️ O\'chirildi');
+}
+
+function renderAdmin() {
+  document.getElementById('totalQ').textContent = questions.length;
+  document.getElementById('totalAttempts').textContent = attempts;
+
+  const letters = ['A','B','C','D'];
+  const list = document.getElementById('qList');
+
+  if (questions.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="emoji">📝</div><p>Hali savollar yo\'q.<br>Yuqorida birinchi savolingizni kiriting!</p></div>';
+    return;
+  }
+
+  list.innerHTML = questions.map((q, i) => `
+    <div class="q-item">
+      <div class="q-num">${i+1}</div>
+      <div class="q-content">
+        <div class="q-text">${q.text}</div>
+        <div class="q-answers">
+          ${q.answers.map((a,ai) => `<div class="q-ans ${ai===q.correct?'correct':''}">${letters[ai]}) ${a}</div>`).join('')}
+        </div>
+      </div>
+      <button class="q-delete" onclick="deleteQuestion(${q.id})">🗑</button>
+    </div>
+  `).join('');
+
+  // Update settings UI
+  document.getElementById('shuffleBtn').textContent = `🔀 Aralashtirish: ${settings.shuffle ? 'YOQ' : 'O\'CH'}`;
+  document.getElementById('shuffleBtn').classList.toggle('on', settings.shuffle);
+  document.getElementById('limitBtn').textContent = `🔢 Limit: ${settings.limit > 0 ? settings.limit + ' ta' : 'Hammasi'}`;
+}
+
+function toggleSetting(key) {
+  settings[key] = !settings[key];
+  save();
+  renderAdmin();
+}
+
+function toggleLimit() {
+  const opts = [0, 10, 20, 30, 50];
+  const idx = opts.indexOf(settings.limit);
+  settings.limit = opts[(idx + 1) % opts.length];
+  save();
+  renderAdmin();
+}
+
+// ===== STUDENT =====
+function showStudentStart() {
+  document.getElementById('student-start').style.display = 'flex';
+  document.getElementById('test-taking').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+
+  const count = questions.length;
+  const displayCount = settings.limit > 0 ? Math.min(settings.limit, count) : count;
+
+  if (count === 0) {
+    document.getElementById('start-count').textContent = '⚠️ Hali testlar yo\'q';
+    document.getElementById('startBtnWrap').innerHTML = '<div class="no-questions-msg">O\'qituvchi hali test qo\'shmagan</div>';
+  } else {
+    document.getElementById('start-count').textContent = `📊 ${displayCount} ta savol`;
+    document.getElementById('startBtnWrap').innerHTML = '<button class="btn-start" onclick="startTest()">▶️ Testni boshlash</button>';
+  }
+}
+
+function startTest() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name) { showToast('⚠️ Ismingizni kiriting!'); return; }
+  if (questions.length === 0) { showToast('⚠️ Testlar mavjud emas!'); return; }
+
+  studentName = name;
+  answers = {};
+  currentQ = 0;
+
+  // Prepare questions
+  let qs = [...questions];
+  if (settings.shuffle) qs = qs.sort(() => Math.random() - 0.5);
+  if (settings.limit > 0) qs = qs.slice(0, settings.limit);
+  testQuestions = qs;
+
+  attempts++;
+  save();
+
+  document.getElementById('student-start').style.display = 'none';
+  document.getElementById('test-taking').style.display = 'flex';
+  document.getElementById('test-taking').style.flexDirection = 'column';
+  document.getElementById('results').style.display = 'none';
+
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = testQuestions[currentQ];
+  const total = testQuestions.length;
+  const letters = ['A','B','C','D'];
+
+  document.getElementById('qNum').textContent = `SAVOL ${currentQ + 1}`;
+  document.getElementById('qCounter').textContent = `${currentQ + 1} / ${total}`;
+  document.getElementById('qTextDisplay').textContent = q.text;
+  document.getElementById('testTitle').textContent = studentName + ' — Test';
+
+  const pct = ((currentQ + 1) / total) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  const opts = document.getElementById('optionsList');
+  opts.innerHTML = q.answers.map((ans, i) => `
+    <button class="option-btn ${answers[currentQ] === i ? 'selected' : ''}" onclick="selectAnswer(${i})">
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">${ans}</div>
+    </button>
+  `).join('');
+
+  document.getElementById('prevBtn').disabled = currentQ === 0;
+  document.getElementById('nextBtn').style.display = currentQ < total - 1 ? 'block' : 'none';
+  document.getElementById('finishBtn').style.display = currentQ === total - 1 ? 'block' : 'none';
+}
+
+function selectAnswer(idx) {
+  answers[currentQ] = idx;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  currentQ += dir;
+  if (currentQ < 0) currentQ = 0;
+  if (currentQ >= testQuestions.length) currentQ = testQuestions.length - 1;
+  renderQuestion();
+}
+
+function finishTest() {
+  const unanswered = testQuestions.filter((_, i) => answers[i] === undefined).length;
+  if (unanswered > 0) {
+    if (!confirm(`${unanswered} ta savol javobsiz qoldi. Tugatishni xohlaysizmi?`)) return;
+  }
+
+  let correct = 0;
+  const reviewItems = testQuestions.map((q, i) => {
+    const isCorrect = answers[i] === q.correct;
+    if (isCorrect) correct++;
+    return { q, isCorrect, chosen: answers[i] };
+  });
+
+  const total = testQuestions.length;
+  const pct = Math.round((correct / total) * 100);
+  const letters = ['A','B','C','D'];
+
+  document.getElementById('student-start').style.display = 'none';
+  document.getElementById('test-taking').style.display = 'none';
+  document.getElementById('results').style.display = 'flex';
+  document.getElementById('results').style.flexDirection = 'column';
+  document.getElementById('results').style.alignItems = 'center';
+  document.getElementById('results').style.justifyContent = 'flex-start';
+  document.getElementById('results').style.paddingTop = '24px';
+
+  const emoji = pct >= 85 ? '🏆' : pct >= 70 ? '🎉' : pct >= 50 ? '👍' : '💪';
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultName').textContent = studentName;
+  document.getElementById('resultScore').textContent = pct + '%';
+  document.getElementById('resultDetail').textContent = `${correct} ta to'g'ri, ${total - correct} ta noto'g'ri (${total} savoldan)`;
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent = total - correct;
+
+  const rev = document.getElementById('reviewList');
+  rev.innerHTML = reviewItems.map((item, i) => `
+    <div class="review-item ${item.isCorrect ? 'correct' : 'wrong'}">
+      <div class="review-q">${i+1}. ${item.q.text}</div>
+      <div class="review-ans">
+        ${item.isCorrect
+          ? `<span class="correct-ans">✅ ${letters[item.q.correct]}) ${item.q.answers[item.q.correct]}</span>`
+          : `<span class="your-ans">❌ Siz: ${item.chosen !== undefined ? letters[item.chosen]+') '+item.q.answers[item.chosen] : 'Javob berilmadi'}</span>
+             &nbsp;→&nbsp;
+             <span class="correct-ans">✅ ${letters[item.q.correct]}) ${item.q.answers[item.q.correct]}</span>`
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function retryTest() {
+  showStudentStart();
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== INIT =====
+load();
+</script>
+</body>
+</html>
